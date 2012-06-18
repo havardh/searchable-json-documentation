@@ -5,27 +5,29 @@ var APP = this.APP || {};
 	var sandbox,
 		template,
 		element,
+		list,
 		data;
 
-	var update = function(tmpl, el, data) {
-		sandbox.updateTemplate(tmpl,el,data);
+	var update = function(tmpl, li, data) {
+		sandbox.updateTemplate(tmpl,li,data);
 	};
 
 	APP.toc = {
 
-		create: function(tmpl, el, dt, sndbx) {
+		create: function(tmpl, el, li, dt, sndbx) {
 			template = tmpl;
 			element = el;
+			list = li;
 			data = dt;
 			sandbox = sndbx;
 			return Object.create(this,{});
 		},
 
 		init: function() {
-			update(template, element, data);
+			update(template, list, data);
 
 			sandbox.hub.subscribe('new-data', function(o) { 
-				update(template, element, o.data);
+				update(template, list, o.data);
 			});
 
 			sandbox.hub.subscribe('hide-index', function(o) { 

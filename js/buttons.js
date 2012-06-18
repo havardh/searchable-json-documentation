@@ -21,7 +21,6 @@ var APP = this.APP || {};
 			});
 
 			hide.on('click', function() {
-				console.log('...');
 				sandbox.hub.publish('hide-index');
 			});
 

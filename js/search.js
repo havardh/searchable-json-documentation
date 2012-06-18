@@ -10,8 +10,11 @@ var APP = this.APP || {};
 		var words = q.split(' ');
 
 		for (var i = 0; i < q.split.length; i += 1) {
-			if ( str.indexOf(words) !== -1) {
-				return true;
+			if (str && words[i]) {
+
+				if ( str.toLowerCase().indexOf(words[i].toLowerCase()) !== -1) {
+					return true;
+				}
 			}
 		}
 		return false;
@@ -77,6 +80,33 @@ var APP = this.APP || {};
 
 	};
 
+	var search = function () {
+
+	};
+
+	var index = function createIndex(n) {
+
+		var i, index = [];
+
+		var add = function (el) {
+			if (index.indexOf(el) === -1) {
+				index.push(el);
+			}
+		};
+
+		for (i in n) {
+
+			if (typeof n[i] === 'string') {
+				add(n[i]);
+			} else if (typeof n[i] === 'object') {
+				createIndex(n[i]).map(add);
+			}
+
+		}
+
+		return index;
+	};
+
 	A.search = {
 		create: function (dt, sndbx) {
 			data = dt;
@@ -99,7 +129,14 @@ var APP = this.APP || {};
 			sandbox.hub.subscribe('clear-search', function () {
 					sandbox.hub.publish('new-data', { data: data });
 			});
-		}
+		},
+
+		search: search,
+		index: (function () {
+			return function () {
+				return index(data);
+			};
+		}())
 	};
 
 }(APP, jQuery));

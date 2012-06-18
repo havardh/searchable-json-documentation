@@ -7,7 +7,7 @@ var APP = this.APP || {};
 	var getMatchingWords = function(query, str) {
 		if (typeof str === 'string') {
 
-			return _.filter(str.split(' '),
+			return _.filter(str.split(/\W/g),
 				function (word) {
 					return word.toUpperCase().indexOf(query.toUpperCase()) !== -1;
 				});
@@ -86,10 +86,8 @@ var APP = this.APP || {};
 
 		};
 
-		var words = _.reduce(_.map(docListData, getAllStrings), extend);
-		
+		words = _.reduce(_.map(docListData, getAllStrings), extend);
 		list = _.reduce(_.map(words,getMatchingWordsForQuery),extend);
-
 		list = unique(list);
 
 		//console.log(list);
@@ -107,7 +105,7 @@ var APP = this.APP || {};
 
 		init: function() {
 
-			input.autocomplete({
+			var auto = input.autocomplete({
 				source: function(request, response) {
 					response(search(request.term));
 				},
@@ -116,8 +114,21 @@ var APP = this.APP || {};
 				}
 			});
 
+			input.on('keyup', function (event) {
+				if (input.val() === '') {
+					sandbox.hub.publish('clear-search');
+				} else if (event.which === 13) {
+					sandbox.hub.publish('search-value-selected');
+					sandbox.hub.publish('autocomplete-focus', { query: input.val() });
+				}
+			});
+
 			sandbox.hub.subscribe('clear-search', function() {
 				input.val('');
+			});
+
+			sandbox.hub.subscribe('search-value-selected', function() {
+				$(auto).autocomplete('close');
 			});
 		}
 

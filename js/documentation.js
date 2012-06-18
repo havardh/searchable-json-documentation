@@ -35,9 +35,6 @@ var APP = this.APP || {};
 			sandbox.hub.subscribe('new-data', function(o) {
 				update(template, element, o.data);
 			});
-	
 		}
-
 	};
-
 }(APP));
