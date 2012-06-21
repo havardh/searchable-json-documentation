@@ -2,7 +2,7 @@ var APP = this.APP || {};
 
 (function (A) {
 
-	var sandbox, input;
+	var sandbox, input, data;
 
 	var getMatchingWords = function(query, str) {
 		if (typeof str === 'string') {
@@ -90,8 +90,6 @@ var APP = this.APP || {};
 		list = _.reduce(_.map(words,getMatchingWordsForQuery),extend);
 		list = unique(list);
 
-		//console.log(list);
-
 		return list;
 	};
 
@@ -103,10 +101,14 @@ var APP = this.APP || {};
 			return Object.create(this,{});
 		},
 
-		init: function() {
+		init: function(dt) {
+
+			index = APP.search.index(dt);
 
 			var auto = input.autocomplete({
 				source: function(request, response) {
+					var matchingData = APP.search.index(data, request.term);
+					console.log(matchingData);
 					response(search(request.term));
 				},
 				focus: function (event, ui) {

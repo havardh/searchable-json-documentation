@@ -80,28 +80,126 @@ var APP = this.APP || {};
 
 	};
 
-	var search = function () {
+	var isArray = function(v) {
+		return  v ? v.constructor.prototype === Array.prototype : false;
+	};
 
+	var isString = function(v) {
+		return typeof v === 'string';
+	};
+
+	var isObject = function(v) {
+		return typeof v === 'object';
+	};
+
+	var searchString = function(str, q) {
+
+		var i, list;
+
+		if (!q) {
+			return str;
+		}
+
+		list = q.split(' ');
+
+		for (i in list) {
+			if (str.indexOf(list[i]) !== -1) {
+				return str;
+			}
+		}
+
+		return  false;
+	};
+
+	var searchObject = function(obj, q) {
+
+		var i, v,
+			rs,
+			match = false,
+			r = {};
+
+		for (i in obj) {
+			v = obj[i];
+
+			if (obj.hasOwnProperty(i)) {
+
+				if (isString(v)) {
+					if (searchString(v, q)) {
+						return obj;
+					} else {
+						r[i] = v;
+					}
+				} else if (isArray(v)) {
+					rs = searchArray(v, q);
+				} else if (isObject(v)) {
+					rs = searchObject(v, q);
+				}
+
+				if (rs) {
+					match = true;
+					r[i] = rs;
+					rs = null;
+				}
+			}
+		}
+
+		if (match) {
+			return r;
+		} else {
+			return false;
+		}
+	};
+
+	var searchArray = function(array, q) {
+		var i, v, r = [];
+
+		for (i in array) {
+			v = search(array[i], q);
+
+			if (v) {
+				r.push(v);
+			}
+		}
+
+		return r;
+	};
+
+	var search = function search(n, q) {
+
+		var r;
+
+		if (isArray(n)) {
+			r = searchArray(n,q);
+		} else if (isString(n)) {
+			r = searchString(n,q);
+		} else if (isObject(n)) {
+			r = searchObject(n,q);
+		}
+
+		return r;
 	};
 
 	var index = function createIndex(n) {
 
-		var i, index = [];
+		var i, index = [],
+			split,
 
-		var add = function (el) {
+			add = function (el) {
 			if (index.indexOf(el) === -1) {
 				index.push(el);
 			}
 		};
 
-		for (i in n) {
+		if (isString(n)) {
+			split = n.split(/\W+/g);
 
-			if (typeof n[i] === 'string') {
-				add(n[i]);
-			} else if (typeof n[i] === 'object') {
+			for (i in split) {
+				add(split[i]);
+			}
+		} else {
+			for (i in n) {
 				createIndex(n[i]).map(add);
 			}
-
 		}
 
 		return index;
@@ -132,11 +230,7 @@ var APP = this.APP || {};
 		},
 
 		search: search,
-		index: (function () {
-			return function () {
-				return index(data);
-			};
-		}())
+		index: index
 	};
 
 }(APP, jQuery));

@@ -26,7 +26,7 @@ var APP = this.APP || {};
 			cpyModule = A.clipboard.create(codes);
 
 		srchModule.init();
-		autModule.init();
+		autModule.init(docListData);
 		tocModule.init();
 		docModule.init();
 		btnModule.init();
